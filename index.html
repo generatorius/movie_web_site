@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Угадай фильм</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game-container {
+      text-align: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007BFF;
+      color: #fff;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .wrong {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Угадай фильм</h1>
+    <div id="question">В каком фильме снимался <span id="actor-name"></span>?</div>
+    <div id="options" class="options-container"></div>
+    <button id="next-question">Следующий вопрос</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    const actorsAndMovies = [
+      { actor: "Леонардо ДиКаприо", movies: ["Титаник", "Начало", "Остров проклятых", "Выживший"] },
+      { actor: "Киану Ривз", movies: ["Матрица", "Джон Уик", "Скорость", "Константин"] },
+      { actor: "Роберт Дауни мл.", movies: ["Железный человек", "Мстители", "Шерлок Холмс", "Судья"] },
+      { actor: "Скарлетт Йоханссон", movies: ["Мстители", "Люси", "Призрак в доспехах", "Брачная история"] },
+    ];
+
+    let currentQuestion = {};
+    const questionElement = document.getElementById("question");
+    const optionsContainer = document.getElementById("options");
+    const resultElement = document.getElementById("result");
+    const nextQuestionButton = document.getElementById("next-question");
+
+    // Создает новый вопрос
+    function generateQuestion() {
+      resultElement.textContent = "";
+
+      // Выбираем случайного актера
+      const randomActorIndex = Math.floor(Math.random() * actorsAndMovies.length);
+      const actorData = actorsAndMovies[randomActorIndex];
+      currentQuestion.actor = actorData.actor;
+
+      // Выбираем правильный ответ
+      const correctMovie = actorData.movies[Math.floor(Math.random() * actorData.movies.length)];
+      currentQuestion.correctAnswer = correctMovie;
+
+      // Генерируем варианты ответа
+      const allMovies = actorsAndMovies.flatMap(a => a.movies);
+      const shuffledMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 3);
+      if (!shuffledMovies.includes(correctMovie)) shuffledMovies[Math.floor(Math.random() * 3)] = correctMovie;
+
+      // Отображаем вопрос
+      document.getElementById("actor-name").textContent = currentQuestion.actor;
+
+      // Отображаем варианты
+      optionsContainer.innerHTML = "";
+      shuffledMovies.forEach(movie => {
+        const button = document.createElement("button");
+        button.textContent = movie;
+        button.addEventListener("click", () => checkAnswer(movie));
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    // Проверяет ответ
+    function checkAnswer(selectedMovie) {
+      if (selectedMovie === currentQuestion.correctAnswer) {
+        resultElement.textContent = "Правильно!";
+        resultElement.className = "correct";
+      } else {
+        resultElement.textContent = `Неправильно! Правильный ответ: ${currentQuestion.correctAnswer}`;
+        resultElement.className = "wrong";
+      }
+    }
+
+    // Обработчик кнопки "Следующий вопрос"
+    nextQuestionButton.addEventListener("click", generateQuestion);
+
+    // Инициализация первого вопроса
+    generateQuestion();
+  </script>
+</body>
+</html>
